@@ -1,8 +1,10 @@
 const overview = document.querySelector(".overview"); // Div inside of the intro
 const username = "estebonbon"; // Personal github username
 const repoList = document.querySelector(".repo-list"); // This is the unordered list
-const indiRepo = document.querySelector(".repos"); // The section with a class of “repos” where all your repo information appears. 
+const repoGallery = document.querySelector(".repos"); // The section with a class of “repos” where all your repo information appears. 
 const repoDataDisplay = document.querySelector(".repo-data"); // This is where the individual repo data will appear.
+const backButton = document.querySelector(".view-repos"); // This will trigger repo's to re-appear.
+const filterInput = document.querySelector(".filter-repos"); // This is the input for the search bar.
 
 
 const gitUserInfo = async function () {
@@ -10,7 +12,6 @@ const gitUserInfo = async function () {
     const user = await userInfo.json();
 
     displayUserInfo(user);
-
     //console.log(user);
 
 };
@@ -44,9 +45,11 @@ const gitRepos = async function () { // The purpose of this function is to gathe
 
 
 const displayRepos = function(repos) { // Repos is the array that is being passed down, from the gitRepos function.
+    
+    filterInput.classList.remove("hide");
     for(let repo of repos) { // The for of loop is a great way to iterate through each repo of "the repos array" and create a list element for each.
         const repoItem = document.createElement("li");
-        repoItem.classList.add("repo");
+        repoItem.classList.add("repo"); // This statement is essential for defing the repo's with a class list of ".repo" in the filterInput eventListener.
         repoItem.innerHTML = `<h3>${repo.name}</h3>`; // with repo.full_name it was presenting my username and the repo name, instead of only the repo name vyit
         repoList.append(repoItem);
     }
@@ -77,7 +80,6 @@ const getRepoInfo = async function (repoName) {
     }
 
     console.log(languages);
-    console.log(languageData);
     displayProperties(repoInfo,languages); // Two arugments were passed, so there properties can be used latter on.
 }; 
 
@@ -93,5 +95,41 @@ const displayProperties = async function(repoInfo, languages) {
     `
     repoDataDisplay.append(div); // This adds all the NEW HTML Information to the bottom of the page!
     repoDataDisplay.classList.remove("hide"); 
-    indiRepo.classList.add("hide"); // Saves the hassle from having to scroll all the way to the bottom of the page to read about the repo that was selected.
+    repoGallery.classList.add("hide"); // Saves the hassle from having to scroll all the way to the bottom of the page to read about the repo that was selected.
+    backButton.classList.remove("hide"); // This presents the user with the back button.
 };
+
+backButton.addEventListener("click", function() {
+    repoGallery.classList.remove("hide");
+    backButton.classList.add("hide");
+    repoDataDisplay.classList.add("hide"); // Hides the previous repo information
+    clearInput();
+});
+
+filterInput.addEventListener("input", function(event) { // The first argument is the event type we want to listen for, which is `'input'` in this case. Inside the event listener function, `event.target.value` gives us the current value of the input element
+    const textInput = event.target.value; // capture the value of the search text.
+    const repos = document.querySelectorAll(".repo") // select ALL elements on the page with a class of “repo”.
+    const textLowerCase = textInput.toLowerCase(); // Create lowercase value of the search text.
+
+    for(const repo of repos) {
+        const repoLowerCase = repo.innerText.toLowerCase(); // Assign lowercase values for the innerText of the repo.
+
+        if(!repoLowerCase.includes(textLowerCase)){ // ^Note 1)
+            repo.classList.add("hide");
+        } else { // included an `else` statement to remove the "hide" class if the text matches, so that previously hidden elements can be shown again
+            repo.classList.remove("hide");
+        }
+    };
+    console.log(textInput);
+});
+
+const clearInput = function () {
+    filterInput.value = ""; // To clear the text in the search bar, It is not about clearing the innerText. It is about clearing the value attached to filterInput!
+}
+
+
+/* Arrow function syntax is a more concise way to write functions in JavaScript. 
+It provides a shorter and simpler syntax compared to traditional function expressions.  "=>" 
+
+^Note 1) When filtering the search results, you want to check if the lowercase `repoLowerCase` string includes the lowercase `textLowerCase` string. 
+In other words, you want to see if the search text is found within the repository text, */
