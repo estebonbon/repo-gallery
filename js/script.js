@@ -125,7 +125,12 @@ filterInput.addEventListener("input", function(event) { // The first argument is
 
 const clearInput = function () {
     filterInput.value = ""; // To clear the text in the search bar, It is not about clearing the innerText. It is about clearing the value attached to filterInput!
-}
+    const repos = document.querySelectorAll(".repo")
+
+    for(const repo of repos) {
+        repo.classList.remove("hide"); 
+    }
+};
 
 
 /* Arrow function syntax is a more concise way to write functions in JavaScript. 
